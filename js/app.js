@@ -268,11 +268,25 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   revealAllBtn.addEventListener("click", () => {
+    // Reveal every card visually (don't change which cards the player actually picked)
     cards.forEach((card) => {
-      if (!card.classList.contains("is-scratched")) {
+      if (!card.classList.contains("fully-scratched")) {
         card.classList.add("fully-scratched");
       }
     });
+
+    // Persist that all cards are now revealed visually
+    saveFinalState();
+
+    // Close the game-over modal and update page state so the board shows everything
+    gameOverModal.classList.remove("visible");
+    document.body.classList.add("selection-done");
+    gameHasEnded = true;
+
+    // Redraw canvases so overlays are removed immediately
+    requestAnimationFrame(drawAllCanvases);
+
+    // hide the reveal button now that everything is revealed
     revealAllBtn.style.display = "none";
   });
 
