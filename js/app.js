@@ -210,12 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
   btnYes.addEventListener("click", () => {
     if (!cardToScratch) return;
     confirmationModal.classList.remove("visible");
-
-    // if (cardToScratch.dataset.giftType === 'jackpot') {
-    //   const sideCard = findUnscratchedCardOfType('side');
-    //   if (sideCard) swapCardData(cardToScratch, sideCard);
-    // }
-    
+    // Enforce game rules: only 1 main gift allowed, must have at least 1 main gift by end
     const currentPickType = cardToScratch.dataset.giftType;
     const mainGiftsWon = wonGiftTypes.filter(t => t === 'main').length;
 
@@ -381,13 +376,6 @@ document.addEventListener("DOMContentLoaded", () => {
       origin: { y: 0.6 },
       zIndex: 1001,
     });
-
-    if (isRestored) {
-      revealAllBtn.style.display = "none";
-    }
-    if (!navigator.share) {
-      shareBtn.style.display = "none";
-    }
   }
 
   function saveFinalState() {
