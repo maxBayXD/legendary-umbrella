@@ -173,6 +173,9 @@ body.selection-done .scratch-card:not(.is-scratched) {
     z-index: 1000;
     padding: 15px;
     box-sizing: border-box;
+    /* allow the overlay to scroll when modal content exceeds viewport height */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-overlay.visible {
@@ -190,6 +193,9 @@ body.selection-done .scratch-card:not(.is-scratched) {
     transition: transform 0.3s;
     width: auto;
     max-width: 400px;
+    /* constrain to viewport height so the modal can scroll on small devices */
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
     position: relative;
 }
 
@@ -199,6 +205,9 @@ body.selection-done .scratch-card:not(.is-scratched) {
 
 .modal-content-lg {
     max-width: 550px;
+    /* also constrain large modal height */
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
 }
 
 .modal-content h2 { margin-top: 0; color: #333; font-weight: 700; }
@@ -331,4 +340,7 @@ body.selection-done .scratch-card:not(.is-scratched) {
     .modal-buttons { flex-direction: column; gap: 10px; }
     .won-gifts-container { flex-direction: column; align-items: center; }
     .won-gift { width: 80%; }
+    /* keep modal content top-aligned and scrollable on very small screens */
+    .modal-overlay { align-items: flex-start; padding-top: 20px; padding-bottom: 20px; }
+    .modal-content { width: 100%; max-width: 100%; }
 }
