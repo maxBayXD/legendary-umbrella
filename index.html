@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch Your Surprise Gift!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,400;8..144,500;8..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="main-title">Select Three Cards to Reveal Your Gifts!</h1>
+        <div class="cards-container">
+            <div class="scratch-card"><div class="prize-content is-hidden"><img src="" alt="Prize Image"><p></p></div><canvas class="scratch-surface"></canvas></div>
+            <div class="scratch-card"><div class="prize-content is-hidden"><img src="" alt="Prize Image"><p></p></div><canvas class="scratch-surface"></canvas></div>
+            <div class="scratch-card"><div class="prize-content is-hidden"><img src="" alt="Prize Image"><p></p></div><canvas class="scratch-surface"></canvas></div>
+            <div class="scratch-card"><div class="prize-content is-hidden"><img src="" alt="Prize Image"><p></p></div><canvas class="scratch-surface"></canvas></div>
+            <div class="scratch-card"><div class="prize-content is-hidden"><img src="" alt="Prize Image"><p></p></div><canvas class="scratch-surface"></canvas></div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmation-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Confirm Your Choice</h2>
+            <p id="modal-text">Are you sure you want to scratch this card?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-yes" id="modal-btn-yes">Yes, Pick It!</button>
+                <button class="modal-btn modal-btn-no" id="modal-btn-no">No, Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal-overlay" id="game-over-modal">
+        <div class="modal-content modal-content-lg">
+            <button class="close-btn" id="close-game-over-btn">&times;</button>
+            <div id="winnings-certificate">
+                <h2>Congratulations!</h2>
+                <p>You've won these amazing gifts:</p>
+                <div class="won-gifts-container">
+                    <!-- Won gifts will be populated here by JS -->
+                </div>
+                <div class="certificate-footer">
+                    <p>Scratch & Win!</p>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" id="reveal-all-btn">Reveal Other Cards</button>
+                <button class="action-btn" id="download-btn">Download Winnings</button>
+                <button class="action-btn" id="share-btn">Share</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
