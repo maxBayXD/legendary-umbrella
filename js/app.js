@@ -291,7 +291,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   downloadBtn.addEventListener("click", () => {
-    html2canvas(certificate, { backgroundColor: null, useCORS: true }).then((canvas) => {
+    // Ensure the exported canvas uses a visible background — prefer the
+    // certificate element's computed backgroundColor when present otherwise
+    // fall back to white. This prevents transparent PNGs (which on some
+    // Android clients make overlay text unreadable).
+    const bg = window.getComputedStyle(certificate).backgroundColor || '#ffffff';
+    const bgColor = (bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') ? '#ffffff' : bg;
+    html2canvas(certificate, { backgroundColor: bgColor, useCORS: true }).then((canvas) => {
       const link = document.createElement("a");
       link.download = "my-winnings.png";
       link.href = canvas.toDataURL("image/png");
@@ -302,7 +308,11 @@ document.addEventListener("DOMContentLoaded", () => {
   shareBtn.addEventListener("click", async () => {
     if (navigator.share) {
       try {
-        const canvas = await html2canvas(certificate, { backgroundColor: null, useCORS: true });
+        // same background handling as the download path — ensure a solid
+        // background to avoid transparent result images on Android/iOS.
+        const bgShare = window.getComputedStyle(certificate).backgroundColor || '#ffffff';
+        const bgColorShare = (bgShare === 'transparent' || bgShare === 'rgba(0, 0, 0, 0)') ? '#ffffff' : bgShare;
+        const canvas = await html2canvas(certificate, { backgroundColor: bgColorShare, useCORS: true });
         canvas.toBlob(async (blob) => {
           const file = new File([blob], "my-winnings.png", { type: "image/png" });
           await navigator.share({
