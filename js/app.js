@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillRect(0, 0, width, height);
     ctx.save();
     ctx.translate(width / 2, height / 2);
-    ctx.rotate(Math.PI / 4);
+    ctx.rotate(-Math.PI / 4);
     const diagonal = Math.sqrt(width * width + height * height);
     ctx.translate(-diagonal / 2, -diagonal / 2);
     const emojiSize = width / 9;
@@ -212,9 +212,12 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmationModal.classList.remove("visible");
     // Enforce game rules: only 1 main gift allowed, must have at least 1 main gift by end
     const currentPickType = cardToScratch.dataset.giftType;
-    const mainGiftsWon = wonGiftTypes.filter(t => t === 'main').length;
+    // Use live DOM counts instead of relying purely on wonGiftTypes array so we don't
+    // get out-of-sync with restored / mutated state (more robust).
+    const picksMade = document.querySelectorAll('.is-scratched').length;
+    const mainGiftsWon = document.querySelectorAll('.is-scratched[data-gift-type="main"]').length;
 
-    if (mainGiftsWon === 1 && currentPickType === 'main') {
+    if (mainGiftsWon >= 1 && currentPickType === 'main') {
       let swapped = false;
       const sideCard = findUnscratchedCardOfType('side');
       if (sideCard) swapped = swapCardData(cardToScratch, sideCard);
@@ -225,15 +228,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (!swapped) console.warn('No available card to swap with (expected side).');
     }
-    else if (wonGiftTypes.length === selectionsAllowed - 1 && mainGiftsWon === 0 && currentPickType !== 'main') {
+    else if (picksMade === selectionsAllowed - 1 && mainGiftsWon === 0 && currentPickType !== 'main') {
       let swapped = false;
       const mainCard = findUnscratchedCardOfType('main');
+      // Try to ensure the final pick becomes a main gift — if we can't find an
+      // unscratched main card to swap with, cancel the selection and inform the user
+      // rather than silently swapping with an unrelated card.
       if (mainCard) swapped = swapCardData(cardToScratch, mainCard);
       if (!swapped) {
-        const fallback = [...cards].find(c => !c.classList.contains('is-scratched') && c !== cardToScratch);
-        if (fallback) swapped = swapCardData(cardToScratch, fallback);
+        // inconsistent state — there's no available unscratched main card to satisfy rule
+        console.warn('No available unscratched main card to swap with; cannot ensure a main gift for final pick.');
+        alert('Could not force a main gift for your final pick. Please choose a different card.');
+        cardToScratch = null;
+        return; // abort selection
       }
-      if (!swapped) console.warn('No available card to swap with (expected main).');
     }
     
     wonGiftTypes.push(cardToScratch.dataset.giftType);
@@ -304,12 +312,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function swapCardData(cardA, cardB) {
     if (!cardA || !cardB) return false;
-    const tempDataset = { ...cardA.dataset };
-    Object.assign(cardA.dataset, cardB.dataset);
-    Object.assign(cardB.dataset, tempDataset);
-    
-    applyCardState(cardA, cardA.dataset);
-    applyCardState(cardB, cardB.dataset);
+
+    // Read a normalized state for both cards from their dataset so we always
+    // hand objects with id/name/type/image/index to applyCardState. Using the
+    // raw DOM dataset directly caused values like `id`/`name` to be undefined
+    // after swapping because dataset keys are giftId/giftName etc.
+    const aState = {
+      id: cardA.dataset.giftId || null,
+      name: cardA.dataset.giftName || null,
+      type: cardA.dataset.giftType || null,
+      image: cardA.dataset.giftImage || null,
+      index: cardA.dataset.cardIndex !== undefined ? cardA.dataset.cardIndex : undefined,
+    };
+    const bState = {
+      id: cardB.dataset.giftId || null,
+      name: cardB.dataset.giftName || null,
+      type: cardB.dataset.giftType || null,
+      image: cardB.dataset.giftImage || null,
+      index: cardB.dataset.cardIndex !== undefined ? cardB.dataset.cardIndex : undefined,
+    };
+
+    // Apply swapped states to datasets
+    cardA.dataset.giftId = bState.id;
+    cardA.dataset.giftName = bState.name;
+    cardA.dataset.giftType = bState.type;
+    cardA.dataset.giftImage = bState.image;
+    if (bState.index !== undefined) cardA.dataset.cardIndex = bState.index;
+
+    cardB.dataset.giftId = aState.id;
+    cardB.dataset.giftName = aState.name;
+    cardB.dataset.giftType = aState.type;
+    cardB.dataset.giftImage = aState.image;
+    if (aState.index !== undefined) cardB.dataset.cardIndex = aState.index;
+
+    // Update the visuals now using normalized state objects
+    applyCardState(cardA, bState);
+    applyCardState(cardB, aState);
 
     const canvasA = cardA.querySelector('.scratch-surface');
     if (canvasA) {
