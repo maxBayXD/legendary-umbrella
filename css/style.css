@@ -293,9 +293,6 @@ body.selection-done .scratch-card:not(.is-scratched) {
     justify-content: center;
     gap: 15px;
     flex-wrap: wrap;
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
 }
 .action-btn {
     border: none;
